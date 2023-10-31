@@ -1,25 +1,53 @@
 "use client"
 
-import { useReactTable,getCoreRowModel,flexRender,getPaginationRowModel } from '@tanstack/react-table'
+import { useReactTable,
+  getCoreRowModel,
+  flexRender,
+  getPaginationRowModel,
+  getSortedRowModel,
+  getFilteredRowModel
+ } from '@tanstack/react-table'
+import { useState } from 'react'
 
 export default function BasicTable({data,columns}){
+
+  const [sorting, setSorting] = useState([])
+  const [filtering, setFiltering] = useState('')
+
     
     const table=useReactTable({
       data,
       columns,
       getCoreRowModel:getCoreRowModel(),
-      getPaginationRowModel:getPaginationRowModel()
+      getPaginationRowModel:getPaginationRowModel(),
+      getSortedRowModel:getSortedRowModel(),
+      getFilteredRowModel:getFilteredRowModel(),
+      state:{
+        sorting:sorting,
+        globalFilter:filtering
+      },
+      onSortingChange:setSorting,
+      onGlobalFilterChange:setFiltering
     })
   
     return (
     <div>
-      <table class="table table-zebra">
+      <input className='input m-5' type='text' value={filtering} onChange={e=>setFiltering(e.target.value)} placeholder='Filter'></input>
+      <table className="table table-zebra">
         <thead>
         {table.getHeaderGroups().map(headerGroup=>(
           <tr key={headerGroup.id}>
             {headerGroup.headers.map(header=>(
-            <th key={header.id}>
-            {flexRender(header.column.columnDef.header,header.getContext())}
+            <th key={header.id} onClick={header.column.getToggleSortingHandler()}>
+            {flexRender(
+              header.column.columnDef.header,
+              header.getContext()
+              )}
+              {
+              {asc:'🔼',desc:'🔽'}[
+                header.column.getIsSorted() ?? null
+              ]
+             }
             </th>
             ))}
           </tr>
@@ -49,10 +77,10 @@ export default function BasicTable({data,columns}){
         </tfoot> */}
       </table>
       <div>
-        <button class="btn" onClick={()=>table.setPageIndex(0)}>First Page</button>
-        <button class="btn" disabled={!table.getCanPreviousPage()} onClick={()=>table.previousPage()}>Previous Page</button>
-        <button class="btn" disabled={!table.getCanNextPage()} onClick={()=>table.nextPage()}>Next Page</button>
-        <button class="btn" onClick={()=>table.setPageIndex(table.getPageCount()-1)}>Last Page</button>
+        <button className="btn" onClick={()=>table.setPageIndex(0)}>First Page</button>
+        <button className="btn" disabled={!table.getCanPreviousPage()} onClick={()=>table.previousPage()}>Previous Page</button>
+        <button className="btn" disabled={!table.getCanNextPage()} onClick={()=>table.nextPage()}>Next Page</button>
+        <button className="btn" onClick={()=>table.setPageIndex(table.getPageCount()-1)}>Last Page</button>
       
       </div>
     </div>
