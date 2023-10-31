@@ -1,1 +1,1 @@
-TanStack React table Practise
+TanStack React table Component in NextJS
